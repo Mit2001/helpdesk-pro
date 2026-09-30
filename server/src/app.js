@@ -1,7 +1,9 @@
+import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import { connectDB } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import searchRoutes from './routes/searchRoutes.js';
@@ -13,6 +15,8 @@ import analyticsRoutes from './routes/analyticsRoutes.js';
 import slaRoutes from './routes/slaRoutes.js';
 import auditLogRoutes from './routes/auditLogRoutes.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
+
+dotenv.config();
 
 const app = express();
 
@@ -51,6 +55,20 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+// Database Connection Middleware for Serverless & Services environments
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('[Database Middleware Connection Error]', err.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error while connecting to database services',
+    });
+  }
+});
 
 // Health Check API - Safe production status
 app.get('/api/health', (req, res) => {

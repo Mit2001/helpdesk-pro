@@ -6,12 +6,17 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB and start HTTP server
-const startServer = async () => {
-  await connectDB();
-  app.listen(PORT, () => {
-    console.log(`[HelpDesk Pro Server] Running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-  });
-};
+// Connect to MongoDB and start HTTP server when running standalone/locally
+if (!process.env.VERCEL) {
+  connectDB()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`[HelpDesk Pro Server] Running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error('[Database Startup Error]', err.message);
+    });
+}
 
-startServer();
+export default app;
