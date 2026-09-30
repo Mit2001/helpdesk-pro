@@ -13,15 +13,16 @@ export const connectDB = async () => {
     return cached.conn;
   }
 
-  const uri = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/helpdesk_pro';
+  const uri = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/helpdeskpro';
 
   if (!cached.promise) {
     cached.promise = mongoose
       .connect(uri, {
+        dbName: process.env.MONGODB_DB || 'helpdeskpro',
         bufferCommands: false,
       })
       .then((mongooseInstance) => {
-        console.log(`[Database] MongoDB Connected: ${mongooseInstance.connection.host}`);
+        console.log(`[Database] MongoDB Connected: ${mongooseInstance.connection.host}/${mongooseInstance.connection.name}`);
         return mongooseInstance;
       });
   }
