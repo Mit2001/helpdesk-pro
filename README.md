@@ -12,7 +12,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.x-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![JWT Auth](https://img.shields.io/badge/JWT-RBAC%20Secured-000000?style=flat-square&logo=json-web-tokens&logoColor=white)](https://jwt.io/)
 [![Tests Passing](https://img.shields.io/badge/Tests-130%2F130%20Passed-brightgreen?style=flat-square&logo=checkmarx&logoColor=white)](#-automated-testing--quality-assurance)
-[![Vercel Ready](https://img.shields.io/badge/Deployment-Vercel%20Serverless-black?style=flat-square&logo=vercel&logoColor=white)](#-production-deployment-vercel--mongodb-atlas)
+[![Vercel Ready](https://img.shields.io/badge/Deployment-Vercel%20Services-black?style=flat-square&logo=vercel&logoColor=white)](#-production-deployment-vercel--mongodb-atlas)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
 <p align="center">
@@ -20,7 +20,7 @@
   Engineered for high-volume enterprise helpdesks with automated SLA tracking, atomic ticket sequencing, multi-tier RBAC, dual-track private internal notes, real-time MongoDB aggregation analytics, and immutable audit trails.
 </p>
 
-[Live Demo (Coming Soon)](#-live-demo) • [Key Features](#-key-features) • [System Architecture](#-system-architecture) • [RBAC Matrix](#-role-based-access-control-rbac) • [API Reference](#-rest-api-reference) • [Local Setup](#-local-setup--quickstart) • [Interview Talking Points](#-architectural-decisions--interview-talking-points)
+[Live Demo](#-live-demo) • [Key Features](#-key-features) • [System Architecture](#-system-architecture) • [RBAC Matrix](#-role-based-access-control-rbac) • [API Reference](#-rest-api-reference) • [Local Setup](#-local-setup--quickstart) • [Interview Talking Points](#-architectural-decisions--interview-talking-points)
 
 </div>
 
@@ -31,6 +31,7 @@
 - [Overview & Problem Statement](#-overview--problem-statement)
 - [Live Demo](#-live-demo)
 - [Key Features](#-key-features)
+- [System Architecture](#-system-architecture)
 - [Role-Based Access Control (RBAC)](#-role-based-access-control-rbac)
 - [Ticket Lifecycle & Workflow](#-ticket-lifecycle--workflow)
 - [SLA Management Engine](#-sla-management-engine)
@@ -67,9 +68,21 @@ Modern enterprise IT departments often struggle with fragmented support channels
 
 | Environment | URL | Status |
 | :--- | :--- | :--- |
-| **Production Web App** | `Coming Soon (Vercel Deployment Pipeline Ready)` | 🟡 Pending Linkage |
-| **Backend REST API** | `https://<your-vercel-domain>.vercel.app/api` | 🟡 Serverless Ready |
-| **API Health Check** | `https://<your-vercel-domain>.vercel.app/api/health` | 🟢 Verified |
+| **Production Web App** | [Open HelpDesk Pro](https://helpdesk-7qzv2ds8x-mit-labs.vercel.app/login) | 🟢 Live |
+| **Backend REST API** | [API Base](https://helpdesk-7qzv2ds8x-mit-labs.vercel.app/api) | 🟢 Live |
+| **API Health Check** | [Health Check](https://helpdesk-7qzv2ds8x-mit-labs.vercel.app/api/health) | 🟢 Verified |
+
+> **Demo Access:** The production application supports separate role-based dashboards for **Admin, Support Engineer, and Employee** users.
+
+### 🚀 Production Status
+
+- 🟢 Production deployment active
+- 🟢 React Router deep-link routing verified
+- 🟢 Admin, Support Engineer, and Employee authentication verified
+- 🟢 MongoDB Atlas production database connected
+- 🟢 REST API health endpoint verified
+- 🟢 130/130 automated regression tests passed
+- 🟢 Production build completed with 0 errors
 
 ---
 
@@ -165,6 +178,8 @@ graph TD
     Controllers --> MongooseModels
     MongooseModels --> DataTier
 ```
+
+---
 
 ## 👥 Role-Based Access Control (RBAC)
 
@@ -408,8 +423,6 @@ erDiagram
 
 ```text
 helpdesk-pro/
-├── api/
-│   └── index.js                        # Vercel Serverless Function entrypoint (with Mongoose pooling)
 ├── client/
 │   ├── public/                         # Favicon and static web assets
 │   ├── src/
@@ -475,13 +488,13 @@ helpdesk-pro/
 │   │   ├── seed/                       # Default category and user seeders
 │   │   ├── utils/                      # SLA calculators, seed runners, and automated test suites
 │   │   ├── app.js                      # Express application assembly and middleware mount
-│   │   └── server.js                   # Standalone HTTP listener for local development
+│   │   └── server.js                   # Express service entrypoint for Vercel & local development
 │   └── package.json                    # Server dependencies and test scripts
 ├── .env.example                        # Root environment example template
 ├── .gitignore                          # Git exclusion rules for node_modules, .env, and dist
 ├── package.json                        # Root workspace configuration
 ├── README.md                           # Project technical documentation
-└── vercel.json                         # Vercel serverless routing and SPA fallback rules
+└── vercel.json                         # Vercel Services configuration and top-level rewrites
 ```
 
 ---
@@ -606,6 +619,7 @@ NODE_ENV=development
 
 # MongoDB Connection String (Local or Atlas)
 MONGODB_URI=mongodb://127.0.0.1:27017/helpdeskpro
+MONGODB_DB=helpdeskpro
 
 # Cryptographic Secret Key for JWT Signing
 JWT_SECRET=your_super_secret_production_jwt_key_min_32_chars
@@ -657,27 +671,56 @@ node server/src/utils/testProductionReadiness.js
 # Run production Vite build from root or client folder
 npm run build
 ```
-*Output: `✓ built in 534ms — 0 errors`.*
+*Output: `✓ built in 1.30s — 0 errors`.*
 
 ---
 
 ## ☁️ Production Deployment (Vercel + MongoDB Atlas)
 
-HelpDesk Pro is architected for unified single-repository deployment on **Vercel** backed by **MongoDB Atlas**:
+HelpDesk Pro uses **Vercel Services** to deploy the React frontend and Express backend as separate services within the same unified Vercel project:
 
-1. **Vercel Serverless Function Handler**: `api/index.js` wraps the Express application in an asynchronous serverless function with Mongoose connection caching (`global.mongooseConnection`) to eliminate database connection exhaustion during traffic spikes.
-2. **SPA Routing**: `vercel.json` rewrites `/api/*` to the serverless entrypoint and `/(.*)` to `index.html` for client-side routing.
+### Services Architecture
 
-### Step-by-Step Vercel Deployment
+1. **Web Service**
+   - **Root**: `client`
+   - **Framework**: Vite
+   - Builds the optimized React production bundle (`dist/`)
+   - Handles React Router SPA fallback (`/(.*)` → `/index.html`)
 
-1. Push your code to GitHub: `git push -u origin main`.
-2. Import the project in the [Vercel Dashboard](https://vercel.com).
-3. Under **Project Settings > Environment Variables**, add:
-   - `MONGODB_URI`: `mongodb+srv://<user>:<password>@<cluster>.mongodb.net/helpdeskpro?retryWrites=true&w=majority`
-   - `JWT_SECRET`: `<your_cryptographically_secure_jwt_secret>`
+2. **API Service**
+   - **Root**: `server`
+   - **Entry Point**: `src/server.js`
+   - Runs the Express REST API
+   - Handles all `/api/*` requests
+
+3. **Database**
+   - **Database Engine**: MongoDB Atlas cloud cluster
+   - **Production Database**: `helpdeskpro`
+   - Configured with Mongoose connection pooling and cached connections across invocations
+
+4. **Routing**
+   - `/api/*` → Routed to the Express API service
+   - All other application routes → Routed to the React web service
+   - SPA fallback (`/(.*)`) → `/index.html` (prevents 404 on page refresh)
+
+5. **Production Environment Variables**
+   - `MONGODB_URI`: MongoDB Atlas cluster connection string
+   - `MONGODB_DB`: `helpdeskpro`
+   - `JWT_SECRET`: Cryptographically secure JWT signing secret
    - `NODE_ENV`: `production`
-   - `CLIENT_URL`: `https://<your-project-name>.vercel.app`
-4. Click **Deploy**. Vercel will automatically build the React Vite bundle and mount the serverless REST API.
+   - `CLIENT_URL`: Production application URL
+
+### Step-by-Step Vercel Deployment Flow
+
+1. Push the project to GitHub (`git push origin main`).
+2. Import the repository into Vercel as a single project.
+3. Vercel automatically detects the Vercel Services configuration defined in `vercel.json`.
+4. The `client` service builds the React/Vite frontend.
+5. The `server` service initializes the Express API handler.
+6. Configure production environment variables in Vercel Project Settings.
+7. Connect the API service to the MongoDB Atlas cluster.
+8. Deploy from the `main` branch.
+9. Verify `/api/health` and the production authentication flow.
 
 ---
 
@@ -703,10 +746,10 @@ HelpDesk Pro is architected for unified single-repository deployment on **Vercel
 > 
 > **Technical Implementation**: We use a unified `$facet` aggregation pipeline executing in parallel within the database engine. MongoDB returns pre-aggregated statistical summaries directly to the client in under 40ms.
 
-### 5. Serverless Database Connection Reuse
-> **Stability Choice**: Vercel Serverless Functions spin up and tear down containers rapidly, which can overwhelm MongoDB with new connection handshakes.
+### 5. Serverless Database Connection Pooling & Resilience
+> **Stability Choice**: Serverless environments spin up and tear down function containers rapidly, which can lead to MongoDB connection exhaustion during sudden traffic spikes.
 > 
-> **Technical Implementation**: `api/index.js` and `server/src/config/db.js` maintain a global cached Mongoose connection across function warm invocations, reusing open sockets and maintaining sub-50ms cold response times.
+> **Technical Implementation**: `server/src/config/db.js` maintains a global cached Mongoose connection (`global.mongoose`) across function warm invocations, reusing open database sockets, explicitly targeting the `helpdeskpro` database, and maintaining sub-50ms cold response times.
 
 ---
 
