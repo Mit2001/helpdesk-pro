@@ -167,23 +167,6 @@ graph TD
     MongooseModels --> DataTier
 ```
 
-### Vercel Serverless Architecture
-
-```mermaid
-graph LR
-    subgraph Vercel Platform
-        ClientReq[Incoming User Request] --> RouterConfig[vercel.json Rewrites]
-        RouterConfig -->|Static Files /(.*)| SPABuild[client/dist/index.html]
-        RouterConfig -->|API Requests /api/(.*)| ServerlessFunc[api/index.js Serverless Handler]
-    end
-
-    subgraph Cloud Infrastructure
-        ServerlessFunc -->|Cached Connection Pool| MongoAtlas[(MongoDB Atlas Cloud Cluster)]
-    end
-```
-
----
-
 ## 👥 Role-Based Access Control (RBAC)
 
 HelpDesk Pro implements strict Role-Based Access Control enforced at the REST API middleware layer, guaranteeing that client-side UI restrictions are backed by zero-trust backend authorization guards.
