@@ -31,7 +31,6 @@
 - [Overview & Problem Statement](#-overview--problem-statement)
 - [Live Demo](#-live-demo)
 - [Key Features](#-key-features)
-- [System Architecture](#-system-architecture)
 - [Role-Based Access Control (RBAC)](#-role-based-access-control-rbac)
 - [Ticket Lifecycle & Workflow](#-ticket-lifecycle--workflow)
 - [SLA Management Engine](#-sla-management-engine)
