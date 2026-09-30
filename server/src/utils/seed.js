@@ -1,4 +1,6 @@
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import { connectDB } from '../config/db.js';
 import User from '../models/User.js';
@@ -8,7 +10,12 @@ import Counter from '../models/Counter.js';
 import { seedUsers } from '../seed/seedUsers.js';
 import { seedCategories } from '../seed/seedCategories.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load environment variables from root or server/.env
 dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const DEFAULT_SLA_POLICIES = [
   {
